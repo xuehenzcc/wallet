@@ -49,4 +49,7 @@ public class HomeService {
 	public List<Pos> getPosList(Pos pos){
 		return homeMapper.getPosList(pos);
 	}
+	public int updatePos(Pos pos){
+		return homeMapper.updatePos(pos);
+	}
 }

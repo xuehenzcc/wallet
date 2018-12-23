@@ -34,8 +34,22 @@ public class Pos {
 	  private Date updateTime;
 	  private Date createTime;
 	  
+	  private Integer count;//总计数量
+	  private Integer activeNum;//激活数量
 	  
 	  
+	public Integer getCount() {
+		return count;
+	}
+	public void setCount(Integer count) {
+		this.count = count;
+	}
+	public Integer getActiveNum() {
+		return activeNum;
+	}
+	public void setActiveNum(Integer activeNum) {
+		this.activeNum = activeNum;
+	}
 	public String getLogo() {
 		return logo;
 	}

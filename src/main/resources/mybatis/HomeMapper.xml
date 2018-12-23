@@ -121,11 +121,37 @@
  			back_time AS backTime,active_time AS activeTime,update_time AS updateTime,create_time AS createTime
  	FROM wallet_pos_zcc 
  	<where>
+ 		<if test="userId!=null">
+ 			and user_id=#{userId}
+ 		</if>
  		<if test="activeUserId!=null">
  			and active_user_id=#{activeUserId}
  		</if>
+ 		<if test="brand != null">
+ 			and brand=#{brand}
+ 		</if>
+ 		<if test="type != null">
+ 			and type=#{type}
+ 		</if>
  	</where>
  </select>
- 
+ <!-- 更新POS -->
+ <update id="updatePos">
+		update wallet_pos_zcc
+			<set>
+		 		<if test="activeUserId != null">
+		 			active_user_id=#{activeUserId},
+		 		</if>
+		 		update_time=now()
+		 	</set>
+  		<where>
+	 		<if test="sn !=null">
+	 			and sn=#{sn}
+	 		</if>
+	 		<if test="id != null">
+	 			and id=#{id}
+	 		</if>
+	 	</where>
+ </update>
  
 </mapper>

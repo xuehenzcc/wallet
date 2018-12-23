@@ -37,4 +37,5 @@ public interface HomeMapper {
 	
 	//获取POS
 	public List<Pos> getPosList(Pos pos);
+	public int updatePos(Pos pos);
 }

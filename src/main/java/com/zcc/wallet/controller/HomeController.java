@@ -1,7 +1,9 @@
 package com.zcc.wallet.controller;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
@@ -441,93 +443,114 @@ public class HomeController extends BaseController{
 			renderJson(request, response, SysCode.SYS_ERR, e.getMessage());
 		}
 	}
-	//获取POS列表
-	@RequestMapping("/getPosList")
-	public void getPosList(HttpServletRequest request,HttpServletResponse response){
+	//获取POS列表(根据品牌)
+	@RequestMapping("/getPosListByBrand")
+	public void getPosListByBrand(HttpServletRequest request,HttpServletResponse response){
 		
 		String[] paramKey = {"userId","type","who"};
-		Map<String, String> params = parseParams(request, "getPosListByTotal", paramKey);
+		Map<String, String> params = parseParams(request, "getPosListByBrand", paramKey);
 		String userId = params.get("userId"); 
 		String type = params.get("type"); //1大pos,2智能pos,3小pos
 		String who = params.get("who"); //z-直营，t-团队
-		if(StringUtils.isBlank(userId)){//id不能为空
+		if(StringUtils.isBlank(userId) || StringUtils.isBlank(type) || StringUtils.isBlank(who)){//id不能为空
         	renderJson(request, response, SysCode.PARAM_IS_ERROR, null);
         	return;
         }
 		Pos posVO=new Pos();
 		posVO.setActiveUserId(Long.valueOf(userId));
 		posVO.setType(type);
-		int z_da=0;//直营_大pos
-		int z_a_da=0;//直营_激活_大pos
-		int z_zhi=0;//直营_智能pos
-		int z_a_zhi=0;//直营_激活_智能pos
-		int z_xiao=0;//直营_小pos
-		int z_a_xiao=0;//直营_激活_小pos
-		int t_da=0;//团队_大pos
-		int t_a_da=0;//团队_激活_大pos
-		int t_zhi=0;//团队_智能pos
-		int t_a_zhi=0;//团队_激活_智能pos
-		int t_xiao=0;//团队_小pos
-		int t_a_xiao=0;//团队_激活_小pos
+		List<Pos> posList=new ArrayList<Pos>();
+		Map<String, List<Pos>> map=new HashMap<String, List<Pos>>();
         try {
 	    	List<Pos> result = homeService.getPosList(posVO);
 	    	for (int i = 0; i < result.size(); i++) {
 	    		Pos pos=result.get(i);
-	    		if("1".equals(pos.getBrand())){//大pos
-	    			z_da++;
-	    			if("1".equals(pos.getStatus())){//激活
-	    				z_a_da++;
-	    			}
-	    		}else if("2".equals(pos.getType())){//智能
-	    			z_zhi++;
-	    			if("1".equals(pos.getStatus())){//激活
-	    				z_a_zhi++;
-	    			}
-	    		}else if("3".equals(pos.getType())){//小pos
-	    			z_xiao++;
-	    			if("1".equals(pos.getStatus())){//激活
-	    				z_a_xiao++;
-	    			}
+	    		List<Pos> list = map.get(pos.getBrand());
+	    		if(list==null){//添加品牌
+	    			list=new ArrayList<Pos>();
+	    			list.add(pos);
+	    			map.put(pos.getBrand(), list);
+	    		}else{//加入列表
+	    			list.add(pos);
 	    		}
 			}
-	    	//团队--（下线）
-	    	List<Pos> tuandui = homeService.getPosList(posVO);
-	    	for (int i = 0; i < tuandui.size(); i++) {
-	    		Pos pos=tuandui.get(i);
-	    		if("1".equals(pos.getType())){//大pos
-	    			t_da++;
-	    			if("1".equals(pos.getStatus())){//激活
-	    				t_a_da++;
-	    			}
-	    		}else if("2".equals(pos.getType())){//智能
-	    			t_zhi++;
-	    			if("1".equals(pos.getStatus())){//激活
-	    				t_a_zhi++;
-	    			}
-	    		}else if("3".equals(pos.getType())){//小pos
-	    			t_xiao++;
-	    			if("1".equals(pos.getStatus())){//激活
-	    				t_a_xiao++;
-	    			}
-	    		}
+	    	for (String brand:map.keySet()) {
+	    		List<Pos> list = map.get(brand);
+	    		int active=0;
+				for (int i = 0; i < list.size(); i++) {
+					if("1".equals(list.get(i).getStatus())){
+						active++;
+					}
+				}
+				Pos p=new Pos();
+				p.setBrand(brand);
+				p.setLogo(list.get(0).getLogo());
+				p.setCount(list.size());
+				p.setActiveNum(active);
+				posList.add(p);
 			}
-	    	TotalPosVO totalPosVO=new TotalPosVO();
-	    	totalPosVO.setT_a_da(t_a_da+z_a_da);
-	    	totalPosVO.setT_a_xiao(t_a_xiao+z_a_xiao);
-	    	totalPosVO.setT_a_zhi(t_a_zhi+z_a_zhi);
-	    	totalPosVO.setT_da(t_da+z_da);
-	    	totalPosVO.setT_xiao(t_xiao+z_xiao);
-	    	totalPosVO.setT_zhi(t_zhi+z_zhi);
-	    	totalPosVO.setZ_a_da(z_a_da);
-	    	totalPosVO.setZ_a_xiao(z_a_xiao);
-	    	totalPosVO.setZ_a_zhi(z_a_zhi);
-	    	totalPosVO.setZ_da(z_da);
-	    	totalPosVO.setZ_xiao(z_xiao);
-	    	totalPosVO.setZ_zhi(z_zhi);
-	    	renderJson(request, response, SysCode.SUCCESS, totalPosVO);//统计POS
+	    	if("t".equals(who)){//团队
+				
+			}
+	    	renderJson(request, response, SysCode.SUCCESS, posList);//统计POS
         } catch (Exception e) {
         	e.printStackTrace();
-        	logger.info("`````method``````getPosListByTotal()`````"+e.getMessage());
+        	logger.info("`````method``````getPosListByBrand()`````"+e.getMessage());
+			renderJson(request, response, SysCode.SYS_ERR, e.getMessage());
+		}
+	}
+	//获取POS列表(根据品牌)
+	@RequestMapping("/getPosList")
+	public void getPosList(HttpServletRequest request,HttpServletResponse response){
+		
+		String[] paramKey = {"userId","type","who","brand"};
+		Map<String, String> params = parseParams(request, "getPosList", paramKey);
+		String userId = params.get("userId"); 
+		String type = params.get("type"); //1大pos,2智能pos,3小pos
+		String who = params.get("who"); //z-直营，t-团队
+		String brand = params.get("brand"); //品牌
+		if(StringUtils.isBlank(userId) || StringUtils.isBlank(type) || StringUtils.isBlank(who)|| StringUtils.isBlank(brand)){//id不能为空
+        	renderJson(request, response, SysCode.PARAM_IS_ERROR, null);
+        	return;
+        }
+		Pos posVO=new Pos();
+		posVO.setActiveUserId(Long.valueOf(userId));
+		posVO.setType(type);
+		posVO.setBrand(brand);
+        try {
+	    	List<Pos> result = homeService.getPosList(posVO);
+	    	if("t".equals(who)){//团队
+				
+			}
+	    	renderJson(request, response, SysCode.SUCCESS, result);//统计POS
+        } catch (Exception e) {
+        	e.printStackTrace();
+        	logger.info("`````method``````getPosList()`````"+e.getMessage());
+			renderJson(request, response, SysCode.SYS_ERR, e.getMessage());
+		}
+	}
+	//下拨POS
+	@RequestMapping("/updatePos")
+	public void updatePos(HttpServletRequest request,HttpServletResponse response){
+		
+		String[] paramKey = {"userId","giveUserId","sn"};
+		Map<String, String> params = parseParams(request, "updatePos", paramKey);
+		String userId = params.get("userId"); 
+		String giveUserId = params.get("giveUserId"); //下拨盟友ID
+		String sn = params.get("sn"); //机器码
+		if(StringUtils.isBlank(userId) || StringUtils.isBlank(giveUserId) || StringUtils.isBlank(sn)){//id不能为空
+        	renderJson(request, response, SysCode.PARAM_IS_ERROR, null);
+        	return;
+        }
+		Pos posVO=new Pos();
+		posVO.setActiveUserId(Long.valueOf(giveUserId));
+		posVO.setSn(sn);
+        try {
+	    	int result = homeService.updatePos(posVO);
+	    	renderJson(request, response, SysCode.SUCCESS, result);//
+        } catch (Exception e) {
+        	e.printStackTrace();
+        	logger.info("`````method``````updatePos()`````"+e.getMessage());
 			renderJson(request, response, SysCode.SYS_ERR, e.getMessage());
 		}
 	}
