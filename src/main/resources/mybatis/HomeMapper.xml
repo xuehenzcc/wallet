@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.zcc.wallet.mapper.HomeMapper">
+ 
+ <!-- 添加地址 -->
+ <insert id="addAddress" useGeneratedKeys="true" keyProperty="id">
+ 	INSERT INTO wallet_address_zcc 
+	(user_id,type,name,telephone,city,address,create_time)
+	VALUES (#{userId},#{type},#{name},#{telephone},#{city},#{address},now())
+ </insert> 
+ <!-- 删除地址 -->
+ <delete id="deleteAddress">
+ 	delete from wallet_address_zcc 
+ 	where id=#{id}
+ </delete> 
+ <!-- 更新地址 -->
+ <update id="updateAddress">
+		update wallet_address_zcc
+			<set>
+		 		<if test="name != null">
+		 			name=#{name},
+		 		</if>
+		 		<if test="telephone != null">
+		 			telephone=#{telephone},
+		 		</if>
+		 		<if test="city != null">
+		 			city=#{city},
+		 		</if>
+		 		<if test="address != null">
+		 			address=#{address},
+		 		</if>
+		 		update_time=now()
+		 	</set>
+  		WHERE id =#{id}
+ </update>
+ <!-- 设置为默认地址 -->
+ <update id="updateAddressByMode">
+		update wallet_address_zcc
+			set type=1
+  		WHERE user_id =#{userId};
+  		update wallet_address_zcc
+			set type=0
+  		WHERE user_id =#{userId} and id=#{id};
+ </update>
+ <!-- 获取地址列表 -->
+ <select id="getAddress" resultType="com.zcc.wallet.vo.Adress">
+ 	SELECT 
+ 		id,user_id AS userId,TYPE,NAME,telephone,city,address,create_time AS createTime,update_time AS updateTime
+ 	FROM wallet_address_zcc 
+ 	where user_id=#{userId}
+ </select>
+ <!-- 获取POS机器列表 -->
+ <select id="getShopList" resultType="com.zcc.wallet.vo.Shop">
+ 	SELECT id,app,TYPE,title,active_amount AS activeAmount,active_back AS activeBack,comp_back AS compBack,
+		comp_require AS compRequire,rate,pay_company AS payCompany,image,content,
+		update_time AS updateTime,create_time AS createTime
+ 	FROM wallet_shop_zcc
+ 	<where>
+ 		<if test="type!=null">
+ 			and type=#{type}
+ 		</if>
+ 		<if test="id != null">
+ 			and id=#{id}
+ 		</if>
+ 	</where>
+ </select>
+ <!-- 创建订单 -->
+ <insert id="addShopOrder" useGeneratedKeys="true" keyProperty="id">
+ 	INSERT INTO wallet_shop_order_zcc 
+	(order_num,user_id,shop_id,shop_name,shop_image,unit_price,COUNT,total_price,state,receive_man,link_tel,receive_address,create_time)
+	VALUES (#{orderNum},#{userId},#{shopId},#{shopName},#{shopImage},#{unitPrice},#{count},#{totalPrice},#{state},#{receiveMan},#{linkTel},#{receiveAddress},now())
+ </insert> 
+ <!-- 获取订单列表 -->
+ <select id="getShopOrderList" resultType="com.zcc.wallet.vo.ShopOrder">
+ 	SELECT id,order_num AS orderNum,user_id AS userId,shop_id as shopId,unit_price AS unitPrice,COUNT,total_price AS totalPrice,state,pay_way AS payWay,
+ 		pay_time AS payTime,express_company AS expressCompany,express_number AS expressNumber,
+		receive_man AS receiveMan,link_tel AS linkTel,receive_address AS receiveAddress,create_time AS createTime
+	FROM wallet_shop_order_zcc
+ 	<where>
+ 		<if test="orderNum!=null">
+ 			and order_num=#{orderNum}
+ 		</if>
+ 		<if test="userId!=null">
+ 			and user_id=#{userId}
+ 		</if>
+ 		<if test="state!=null">
+ 			and state=#{state}
+ 		</if>
+ 		<if test="id != null">
+ 			and id=#{id}
+ 		</if>
+ 	</where>
+ </select>
+ <!-- 更新订单 -->
+ <update id="updateShopOrder">
+		update wallet_shop_order_zcc
+			<set>
+		 		<if test="state != null">
+		 			state=#{state},
+		 		</if>
+		 		<if test="payWay != null">
+		 			pay_way=#{payWay},
+		 		</if>
+		 		<if test="payTime != null">
+		 			pay_time=#{payTime},
+		 		</if>
+		 	</set>
+  		<where>
+	 		<if test="orderNum!=null">
+	 			and order_num=#{orderNum}
+	 		</if>
+	 		<if test="id != null">
+	 			and id=#{id}
+	 		</if>
+	 	</where>
+ </update>
+ <!-- 获取POS列表 -->
+ <select id="getPosList" resultType="com.zcc.wallet.vo.Pos">
+ 	SELECT id,user_id AS userId,active_user_id AS activeUserId,ACTION,TYPE,STATUS,logo,brand,sn,back_amt AS backAmt,
+ 			back_time AS backTime,active_time AS activeTime,update_time AS updateTime,create_time AS createTime
+ 	FROM wallet_pos_zcc 
+ 	<where>
+ 		<if test="activeUserId!=null">
+ 			and active_user_id=#{activeUserId}
+ 		</if>
+ 	</where>
+ </select>
+ 
+ 
+</mapper>
