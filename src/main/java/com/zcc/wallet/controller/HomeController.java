@@ -503,20 +503,28 @@ public class HomeController extends BaseController{
 	@RequestMapping("/getPosList")
 	public void getPosList(HttpServletRequest request,HttpServletResponse response){
 		
-		String[] paramKey = {"userId","type","who","brand"};
+		String[] paramKey = {"userId","type","who","brand","sn","action"};
 		Map<String, String> params = parseParams(request, "getPosList", paramKey);
 		String userId = params.get("userId"); 
 		String type = params.get("type"); //1大pos,2智能pos,3小pos
 		String who = params.get("who"); //z-直营，t-团队
 		String brand = params.get("brand"); //品牌
+		String sn = params.get("sn"); //sn
+		String action = params.get("action"); //1下发，2召回
 		if(StringUtils.isBlank(userId) || StringUtils.isBlank(type) || StringUtils.isBlank(who)|| StringUtils.isBlank(brand)){//id不能为空
         	renderJson(request, response, SysCode.PARAM_IS_ERROR, null);
         	return;
         }
 		Pos posVO=new Pos();
-		posVO.setActiveUserId(Long.valueOf(userId));
 		posVO.setType(type);
 		posVO.setBrand(brand);
+		posVO.setSn(sn);
+		posVO.setAction(action);
+		if("1".equals(action)){
+			posVO.setUserId(Long.valueOf(userId));
+		}else{
+			posVO.setActiveUserId(Long.valueOf(userId));
+		}
         try {
 	    	List<Pos> result = homeService.getPosList(posVO);
 	    	if("t".equals(who)){//团队
@@ -533,18 +541,37 @@ public class HomeController extends BaseController{
 	@RequestMapping("/updatePos")
 	public void updatePos(HttpServletRequest request,HttpServletResponse response){
 		
-		String[] paramKey = {"userId","giveUserId","sn"};
+		String[] paramKey = {"userId","giveUserId","sn","action"};
 		Map<String, String> params = parseParams(request, "updatePos", paramKey);
 		String userId = params.get("userId"); 
 		String giveUserId = params.get("giveUserId"); //下拨盟友ID
 		String sn = params.get("sn"); //机器码
-		if(StringUtils.isBlank(userId) || StringUtils.isBlank(giveUserId) || StringUtils.isBlank(sn)){//id不能为空
+		String action = params.get("action"); //1下放，2召回,3同意,4不同意
+		if(StringUtils.isBlank(sn)|| StringUtils.isBlank(action)){//id不能为空
         	renderJson(request, response, SysCode.PARAM_IS_ERROR, null);
         	return;
         }
 		Pos posVO=new Pos();
-		posVO.setActiveUserId(Long.valueOf(giveUserId));
 		posVO.setSn(sn);
+		posVO.setAction(action);//下放、召回
+		if("1".equals(action)){
+			if(StringUtils.isBlank(giveUserId)){//id不能为空
+	        	renderJson(request, response, SysCode.PARAM_IS_ERROR, null);
+	        	return;
+	        }
+			posVO.setActiveUserId(Long.valueOf(giveUserId));
+		}else if("2".equals(action)){
+			//发送消息--giveUserId
+		}else if("3".equals(action)){
+			if(StringUtils.isBlank(userId)){//id不能为空
+	        	renderJson(request, response, SysCode.PARAM_IS_ERROR, null);
+	        	return;
+	        }
+			//同意召回
+			posVO.setActiveUserId(Long.valueOf(giveUserId));
+		}else if("4".equals(action)){
+			//不同意
+		}
         try {
 	    	int result = homeService.updatePos(posVO);
 	    	renderJson(request, response, SysCode.SUCCESS, result);//
