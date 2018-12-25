@@ -133,6 +133,12 @@
  		<if test="type != null">
  			and type=#{type}
  		</if>
+ 		<if test="sn != null">
+ 			and sn=#{sn}
+ 		</if>
+ 		<if test="action != null">
+ 			and action=#{action}
+ 		</if>
  	</where>
  </select>
  <!-- 更新POS -->
@@ -141,6 +147,13 @@
 			<set>
 		 		<if test="activeUserId != null">
 		 			active_user_id=#{activeUserId},
+		 		</if>
+		 		<if test="action != null">
+		 			<!-- 同意召回 -->
+		 			<if test="action == 3">
+		 				active_user_id=user_id,
+		 			</if>
+		 			action = #{action},
 		 		</if>
 		 		update_time=now()
 		 	</set>
@@ -153,5 +166,30 @@
 	 		</if>
 	 	</where>
  </update>
+ 
+<!-- 获取 交易记录 列表 -->
+ <select id="getBusinessDataList" resultType="com.zcc.wallet.vo.BusinessData">
+ 	<![CDATA[
+	 	SELECT id,STATUS,remark,remark2,remark3,amt,sn,create_time AS createTime FROM wallet_business_zcc
+		WHERE create_time >=#{startTime} AND create_time <=#{endTime}
+		AND sn IN (SELECT sn FROM wallet_pos_zcc WHERE active_user_id = #{remark} OR active_user_id = #{remark2}) 
+ 	]]>
+ </select>
+ <!-- 获取 收益 列表 -->
+  <select id="getImcomeList" resultType="com.zcc.wallet.vo.Account">
+	 	 SELECT id,pos_type AS posType,user_id AS userId,user_name AS userName,user_telephone AS userTelephone,user_leave AS userLeave,amount,create_time AS createTime 
+		 FROM wallet_account_zcc 
+		 <where>
+	 		<if test="userId !=null">
+	 			and user_id = #{userId}
+	 		</if>
+	 		<if test="posType !=null">
+	 			and pos_type = #{posType}
+	 		</if>
+	 	</where>
+		 ORDER BY createTime DESC
+ </select>
+
+
  
 </mapper>

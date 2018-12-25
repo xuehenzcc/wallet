@@ -9,7 +9,9 @@ import java.util.List;
 
 import org.springframework.stereotype.Component;
 
+import com.zcc.wallet.vo.Account;
 import com.zcc.wallet.vo.Adress;
+import com.zcc.wallet.vo.BusinessData;
 import com.zcc.wallet.vo.Pos;
 import com.zcc.wallet.vo.Shop;
 import com.zcc.wallet.vo.ShopOrder;
@@ -38,4 +40,7 @@ public interface HomeMapper {
 	//获取POS
 	public List<Pos> getPosList(Pos pos);
 	public int updatePos(Pos pos);
+	
+	public List<BusinessData> getBusinessDataList(BusinessData data);
+	public List<Account> getImcomeList(Account data);
 }

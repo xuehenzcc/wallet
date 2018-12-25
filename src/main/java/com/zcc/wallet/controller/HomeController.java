@@ -19,7 +19,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import com.zcc.wallet.common.SysCode;
 import com.zcc.wallet.service.HomeService;
 import com.zcc.wallet.util.DateUtil;
+import com.zcc.wallet.vo.Account;
 import com.zcc.wallet.vo.Adress;
+import com.zcc.wallet.vo.BusinessData;
 import com.zcc.wallet.vo.Pos;
 import com.zcc.wallet.vo.Shop;
 import com.zcc.wallet.vo.ShopOrder;
@@ -499,7 +501,7 @@ public class HomeController extends BaseController{
 			renderJson(request, response, SysCode.SYS_ERR, e.getMessage());
 		}
 	}
-	//获取POS列表(根据品牌)
+	//获取POS列表(根据品牌、召回)
 	@RequestMapping("/getPosList")
 	public void getPosList(HttpServletRequest request,HttpServletResponse response){
 		
@@ -511,10 +513,10 @@ public class HomeController extends BaseController{
 		String brand = params.get("brand"); //品牌
 		String sn = params.get("sn"); //sn
 		String action = params.get("action"); //1下发，2召回
-		if(StringUtils.isBlank(userId) || StringUtils.isBlank(type) || StringUtils.isBlank(who)|| StringUtils.isBlank(brand)){//id不能为空
-        	renderJson(request, response, SysCode.PARAM_IS_ERROR, null);
-        	return;
-        }
+//		if(StringUtils.isBlank(userId) || StringUtils.isBlank(type) || StringUtils.isBlank(who)|| StringUtils.isBlank(brand)){//id不能为空
+//        	renderJson(request, response, SysCode.PARAM_IS_ERROR, null);
+//        	return;
+//        }
 		Pos posVO=new Pos();
 		posVO.setType(type);
 		posVO.setBrand(brand);
@@ -543,7 +545,7 @@ public class HomeController extends BaseController{
 		
 		String[] paramKey = {"userId","giveUserId","sn","action"};
 		Map<String, String> params = parseParams(request, "updatePos", paramKey);
-		String userId = params.get("userId"); 
+//		String userId = params.get("userId"); 
 		String giveUserId = params.get("giveUserId"); //下拨盟友ID
 		String sn = params.get("sn"); //机器码
 		String action = params.get("action"); //1下放，2召回,3同意,4不同意
@@ -563,12 +565,7 @@ public class HomeController extends BaseController{
 		}else if("2".equals(action)){
 			//发送消息--giveUserId
 		}else if("3".equals(action)){
-			if(StringUtils.isBlank(userId)){//id不能为空
-	        	renderJson(request, response, SysCode.PARAM_IS_ERROR, null);
-	        	return;
-	        }
 			//同意召回
-			posVO.setActiveUserId(Long.valueOf(giveUserId));
 		}else if("4".equals(action)){
 			//不同意
 		}
@@ -578,6 +575,66 @@ public class HomeController extends BaseController{
         } catch (Exception e) {
         	e.printStackTrace();
         	logger.info("`````method``````updatePos()`````"+e.getMessage());
+			renderJson(request, response, SysCode.SYS_ERR, e.getMessage());
+		}
+	}
+	//交易数据列表()
+	@RequestMapping("/getBusinessDataList")
+	public void getBusinessDataList(HttpServletRequest request,HttpServletResponse response){
+		
+		String[] paramKey = {"userId","startTime","endTime","who"};
+		Map<String, String> params = parseParams(request, "getBusinessDataList", paramKey);
+		String userId = params.get("userId"); 
+		String who = params.get("who"); //z-直营，t-团队
+		String startTime = params.get("startTime"); //开始时间
+		String endTime = params.get("endTime"); //结束时间
+		if(StringUtils.isBlank(userId) || StringUtils.isBlank(startTime) || StringUtils.isBlank(who)|| StringUtils.isBlank(endTime)){//id不能为空
+        	renderJson(request, response, SysCode.PARAM_IS_ERROR, null);
+        	return;
+        }
+		BusinessData data=new BusinessData();
+		data.setStartTime(startTime);
+		data.setEndTime(endTime);
+		data.setRemark(userId);
+		if("t".equals(who)){//团队
+			
+		}else{
+			data.setRemark2(userId);
+		}
+		
+        try {
+	    	List<BusinessData> result = homeService.getBusinessDataList(data);
+	    	renderJson(request, response, SysCode.SUCCESS, result);
+        } catch (Exception e) {
+        	e.printStackTrace();
+        	logger.info("`````method``````getBusinessDataList()`````"+e.getMessage());
+			renderJson(request, response, SysCode.SYS_ERR, e.getMessage());
+		}
+	}
+	
+	//交易- 收益明细 -列表()
+	@RequestMapping("/getImcomeList")
+	public void getImcomeList(HttpServletRequest request,HttpServletResponse response){
+		
+		String[] paramKey = {"userId","type"};
+		Map<String, String> params = parseParams(request, "getImcomeList", paramKey);
+		String userId = params.get("userId"); 
+		String type = params.get("type"); //z-直营，t-团队
+		if(StringUtils.isBlank(userId) || StringUtils.isBlank(type)){//id不能为空
+        	renderJson(request, response, SysCode.PARAM_IS_ERROR, null);
+        	return;
+        }
+		Account data=new Account();
+		data.setUserId(Long.valueOf(userId));
+		if("1".equals(type) || "2".equals(type) || "3".equals(type)){
+			data.setPosType(type);
+		}
+        try {
+	    	List<Account> result = homeService.getImcomeList(data);
+	    	renderJson(request, response, SysCode.SUCCESS, result);
+        } catch (Exception e) {
+        	e.printStackTrace();
+        	logger.info("`````method``````getImcomeList()`````"+e.getMessage());
 			renderJson(request, response, SysCode.SYS_ERR, e.getMessage());
 		}
 	}

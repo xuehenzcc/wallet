@@ -6,7 +6,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.zcc.wallet.mapper.HomeMapper;
+import com.zcc.wallet.vo.Account;
 import com.zcc.wallet.vo.Adress;
+import com.zcc.wallet.vo.BusinessData;
 import com.zcc.wallet.vo.Pos;
 import com.zcc.wallet.vo.Shop;
 import com.zcc.wallet.vo.ShopOrder;
@@ -52,4 +54,11 @@ public class HomeService {
 	public int updatePos(Pos pos){
 		return homeMapper.updatePos(pos);
 	}
+	public List<BusinessData> getBusinessDataList(BusinessData data){
+		return homeMapper.getBusinessDataList(data);
+	}
+	public List<Account> getImcomeList(Account data){
+		return homeMapper.getImcomeList(data);
+	}
+	
 }
