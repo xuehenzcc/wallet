@@ -185,7 +185,7 @@ public class HomeController extends BaseController{
         	return;
         }
 		Shop posVO=new Shop();
-		posVO.setType(type);//机器类型（1大pos，2智能pos,3小pos）
+		posVO.setType(type);//机器类型（0展业,1大pos，2智能pos,3小pos）
 		
         try {
 	    	List<Shop> result = homeService.getShopList(posVO);
@@ -236,7 +236,7 @@ public class HomeController extends BaseController{
         	return;
         }
 		ShopOrder orderVO=new ShopOrder();
-		orderVO.setState(status);//订单状态
+		orderVO.setState(status);//订单状态(1待支付，2待发货，3待收货，4已完成)
 		orderVO.setUserId(Long.valueOf(userId));
 		
         try {
@@ -256,13 +256,15 @@ public class HomeController extends BaseController{
 		Map<String, String> params = parseParams(request, "getShopOrder", paramKey);
 		String orderNum = params.get("orderNum"); 
 		String id = params.get("id"); 
-		if(StringUtils.isBlank(id)){//id不能为空
+		if(StringUtils.isBlank(id) && StringUtils.isBlank(orderNum)){//id不能为空
         	renderJson(request, response, SysCode.PARAM_IS_ERROR, null);
         	return;
         }
 		ShopOrder orderVO=new ShopOrder();
 		orderVO.setOrderNum(orderNum);//订单编号 
-		orderVO.setId(Long.valueOf(id));
+		if(!StringUtils.isBlank(id)){
+			orderVO.setId(Long.valueOf(id));
+		}
 		
         try {
 	    	List<ShopOrder> result = homeService.getShopOrderList(orderVO);
@@ -340,14 +342,14 @@ public class HomeController extends BaseController{
 		String orderNum = params.get("orderNum"); 
 		String payWay = params.get("payWay"); 
 		String status = params.get("status"); 
-		if(StringUtils.isBlank(status) || StringUtils.isBlank(orderNum)|| StringUtils.isBlank(payWay)){//id不能为空
+		if(StringUtils.isBlank(status) || StringUtils.isBlank(orderNum)){//id不能为空
         	renderJson(request, response, SysCode.PARAM_IS_ERROR, null);
         	return;
         }
 		ShopOrder orderVO=new ShopOrder();
 		orderVO.setOrderNum(orderNum);//订单编号 
 		orderVO.setState(status);//待支付
-		orderVO.setPayWay(payWay);//支付方式
+//		orderVO.setPayWay(payWay);//支付方式
 		
         try {
 	    	Integer result = homeService.updateShopOrder(orderVO);
