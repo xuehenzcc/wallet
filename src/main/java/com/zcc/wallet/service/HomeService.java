@@ -1,7 +1,9 @@
 package com.zcc.wallet.service;
 
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -85,4 +87,20 @@ public class HomeService {
 	public Integer addPosLog(PosLog data){
 		return homeMapper.addPosLog(data);
 	}
+	//计算pos是否达到刷满条件 
+	public void getCompPos(){
+		Pos pos=new Pos();
+		pos.setStatus("0");//未激活
+		Set<String> sns=new HashSet<String>();
+		List<Pos> posList=homeMapper.getPosList(pos);
+		for (Pos p:posList) {
+			String sn = p.getSn();
+			sns.add(sn);
+			BusinessData data=new BusinessData();
+			data.setSn(sn);
+			homeMapper.getBusinessDataList(data);
+		}
+		
+	}
+	
 }
