@@ -16,7 +16,7 @@
 			</encoder>
 		</appender>
 		
-		<logger name="com.zcc.game" level="debug"/>
+		<logger name="com.zcc.wallet" level="debug"/>
 		<logger name="org.springframework.jdbc.core.JdbcTemplate" level="debug"/>
 		
 		<root level="info">

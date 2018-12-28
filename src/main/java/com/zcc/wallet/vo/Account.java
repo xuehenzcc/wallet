@@ -23,6 +23,7 @@ public class Account {
 //	  `amount` DECIMAL(10,2) NOT NULL COMMENT '收益金额',
 //	  `create_time` DATETIME DEFAULT NULL COMMENT '创建时间',
 	private Long id;
+	private String app; 
 	private String posType; 
 	private Long userId; 
 	private String userName; 
@@ -77,6 +78,12 @@ public class Account {
 	}
 	public void setAmount(BigDecimal amount) {
 		this.amount = amount;
+	}
+	public String getApp() {
+		return app;
+	}
+	public void setApp(String app) {
+		this.app = app;
 	} 
 	
 	

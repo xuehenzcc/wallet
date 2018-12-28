@@ -25,6 +25,7 @@ public class BusinessData {
 	  
 	 private Long id;
 	 private String status;
+	 private String userId;
 	 private String remark;
 	 private String remark2;
 	 private String remark3;
@@ -38,6 +39,12 @@ public class BusinessData {
 	 
 	 
 	 
+	public String getUserId() {
+		return userId;
+	}
+	public void setUserId(String userId) {
+		this.userId = userId;
+	}
 	public String getStartTime() {
 		return startTime;
 	}

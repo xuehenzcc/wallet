@@ -1,15 +1,18 @@
 package com.zcc.wallet.service;
 
+import java.util.Date;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.zcc.wallet.mapper.HomeMapper;
 import com.zcc.wallet.vo.Account;
 import com.zcc.wallet.vo.Adress;
 import com.zcc.wallet.vo.BusinessData;
 import com.zcc.wallet.vo.Pos;
+import com.zcc.wallet.vo.PosLog;
 import com.zcc.wallet.vo.Shop;
 import com.zcc.wallet.vo.ShopOrder;
 
@@ -51,7 +54,26 @@ public class HomeService {
 	public List<Pos> getPosList(Pos pos){
 		return homeMapper.getPosList(pos);
 	}
+	
+	@Transactional
 	public int updatePos(Pos pos){
+		PosLog data=new PosLog();
+		data.setSn(pos.getSn());
+		data.setStatus("0");
+		if("1".equals(pos.getAction())){//下发
+			data.setUserId(pos.getActiveUserId());
+			homeMapper.addPosLog(data);
+		}else if("3".equals(pos.getAction())){//同意召回
+			Pos p=new Pos();
+			p.setSn(pos.getSn());
+			List<Pos> ps=homeMapper.getPosList(p);
+			if(ps.size()>0){
+				data.setUserId(ps.get(0).getUserId());
+				homeMapper.addPosLog(data);
+			}else{
+				return 0;
+			}
+		}
 		return homeMapper.updatePos(pos);
 	}
 	public List<BusinessData> getBusinessDataList(BusinessData data){
@@ -60,5 +82,7 @@ public class HomeService {
 	public List<Account> getImcomeList(Account data){
 		return homeMapper.getImcomeList(data);
 	}
-	
+	public Integer addPosLog(PosLog data){
+		return homeMapper.addPosLog(data);
+	}
 }

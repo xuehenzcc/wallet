@@ -167,12 +167,13 @@
 	 	</where>
  </update>
  
-<!-- 获取 交易记录 列表 -->
+<!-- 获取 交易记录 列表   AND sn IN (SELECT sn FROM wallet_pos_zcc WHERE active_user_id = #{remark} OR active_user_id = #{remark2}) -->
  <select id="getBusinessDataList" resultType="com.zcc.wallet.vo.BusinessData">
  	<![CDATA[
-	 	SELECT id,STATUS,remark,remark2,remark3,amt,sn,create_time AS createTime FROM wallet_business_zcc
-		WHERE create_time >=#{startTime} AND create_time <=#{endTime}
-		AND sn IN (SELECT sn FROM wallet_pos_zcc WHERE active_user_id = #{remark} OR active_user_id = #{remark2}) 
+	 	SELECT id,STATUS,remark,remark2,remark3,amt,sn,create_time AS createTime,user_id AS userId,business_time AS businessTime 
+	 	FROM wallet_business_zcc
+		WHERE business_time >=#{startTime} AND business_time <=#{endTime}
+		AND user_id=#{userId} 
  	]]>
  </select>
  <!-- 获取 收益 列表 -->
@@ -186,10 +187,22 @@
 	 		<if test="posType !=null">
 	 			and pos_type = #{posType}
 	 		</if>
+	 		<if test="app !=null">
+	 			and app = #{app}
+	 		</if>
 	 	</where>
 		 ORDER BY createTime DESC
  </select>
-
+ <!-- 创建POS日志 -->
+ <insert id="addPosLog" useGeneratedKeys="true" keyProperty="id">
+ 	update wallet_poslog_zcc set status='1',end_time=now() where sn=#{sn} and status='0';
+ 	
+ 	INSERT INTO wallet_poslog_zcc 
+	(sn,user_id,type,status,start_time,create_time)
+	VALUES (#{sn},#{userId},
+	(SELECT TYPE FROM wallet_pos_zcc WHERE sn=#{sn}),
+	#{status},now(),now());
+ </insert> 
 
  
 </mapper>

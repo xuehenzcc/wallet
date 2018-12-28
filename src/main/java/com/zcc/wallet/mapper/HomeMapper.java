@@ -13,6 +13,7 @@ import com.zcc.wallet.vo.Account;
 import com.zcc.wallet.vo.Adress;
 import com.zcc.wallet.vo.BusinessData;
 import com.zcc.wallet.vo.Pos;
+import com.zcc.wallet.vo.PosLog;
 import com.zcc.wallet.vo.Shop;
 import com.zcc.wallet.vo.ShopOrder;
 
@@ -43,4 +44,5 @@ public interface HomeMapper {
 	
 	public List<BusinessData> getBusinessDataList(BusinessData data);
 	public List<Account> getImcomeList(Account data);
+	public int addPosLog(PosLog order);//创建POSLog
 }

@@ -564,7 +564,7 @@ public class HomeController extends BaseController{
 	        	return;
 	        }
 			posVO.setActiveUserId(Long.valueOf(giveUserId));
-		}else if("2".equals(action)){
+		}else if("2".equals(action)){//召回
 			//发送消息--giveUserId
 		}else if("3".equals(action)){
 			//同意召回
@@ -597,11 +597,10 @@ public class HomeController extends BaseController{
 		BusinessData data=new BusinessData();
 		data.setStartTime(startTime);
 		data.setEndTime(endTime);
-		data.setRemark(userId);
 		if("t".equals(who)){//团队
 			
 		}else{
-			data.setRemark2(userId);
+			data.setUserId(userId);
 		}
 		
         try {
@@ -618,18 +617,24 @@ public class HomeController extends BaseController{
 	@RequestMapping("/getImcomeList")
 	public void getImcomeList(HttpServletRequest request,HttpServletResponse response){
 		
-		String[] paramKey = {"userId","type"};
+		String[] paramKey = {"userId","type","app"};
 		Map<String, String> params = parseParams(request, "getImcomeList", paramKey);
 		String userId = params.get("userId"); 
-		String type = params.get("type"); //z-直营，t-团队
-		if(StringUtils.isBlank(userId) || StringUtils.isBlank(type)){//id不能为空
+		String app = params.get("app"); 
+		String type = params.get("type"); //1大2智能3小4激活返现
+		if(StringUtils.isBlank(userId) || StringUtils.isBlank(app)){//id不能为空
         	renderJson(request, response, SysCode.PARAM_IS_ERROR, null);
         	return;
         }
 		Account data=new Account();
 		data.setUserId(Long.valueOf(userId));
-		if("1".equals(type) || "2".equals(type) || "3".equals(type)){
-			data.setPosType(type);
+		if("1".equals(app)){//pos
+			data.setApp("1");//pos
+			if("1".equals(type) || "2".equals(type) || "3".equals(type)){
+				data.setPosType(type);
+			}//else 全部pos
+		}else{
+			data.setApp("2");//激活返现 
 		}
         try {
 	    	List<Account> result = homeService.getImcomeList(data);
@@ -640,4 +645,6 @@ public class HomeController extends BaseController{
 			renderJson(request, response, SysCode.SYS_ERR, e.getMessage());
 		}
 	}
+	
+	
 }
