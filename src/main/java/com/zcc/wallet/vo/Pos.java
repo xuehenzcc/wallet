@@ -1,5 +1,6 @@
 package com.zcc.wallet.vo;
 
+import java.math.BigDecimal;
 import java.util.Date;
 
 /**
@@ -28,7 +29,11 @@ public class Pos {
 	  private String logo;//logo
 	  private String brand;//品牌
 	  private String sn;
-	  private String backAmt;
+	  private int reach;//达标
+	  private int limitnum;//期限
+	  private BigDecimal compAmt;
+	  private BigDecimal amt;
+	  private BigDecimal backAmt;
 	  private Date backTime;
 	  private Date activeTime;
 	  private Date updateTime;
@@ -62,10 +67,36 @@ public class Pos {
 	public void setBrand(String brand) {
 		this.brand = brand;
 	}
-	public String getBackAmt() {
+	
+	public int getReach() {
+		return reach;
+	}
+	public void setReach(int reach) {
+		this.reach = reach;
+	}
+	
+	public int getLimitnum() {
+		return limitnum;
+	}
+	public void setLimitnum(int limitnum) {
+		this.limitnum = limitnum;
+	}
+	public BigDecimal getCompAmt() {
+		return compAmt;
+	}
+	public void setCompAmt(BigDecimal compAmt) {
+		this.compAmt = compAmt;
+	}
+	public BigDecimal getAmt() {
+		return amt;
+	}
+	public void setAmt(BigDecimal amt) {
+		this.amt = amt;
+	}
+	public BigDecimal getBackAmt() {
 		return backAmt;
 	}
-	public void setBackAmt(String backAmt) {
+	public void setBackAmt(BigDecimal backAmt) {
 		this.backAmt = backAmt;
 	}
 	public Date getBackTime() {

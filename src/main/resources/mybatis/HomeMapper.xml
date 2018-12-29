@@ -118,6 +118,7 @@
  <!-- 获取POS列表 -->
  <select id="getPosList" resultType="com.zcc.wallet.vo.Pos">
  	SELECT id,user_id AS userId,active_user_id AS activeUserId,ACTION,TYPE,STATUS,logo,brand,sn,back_amt AS backAmt,
+ 			reach,limitnum,comp_amt as compAmt,amt,user_name as userName,
  			back_time AS backTime,active_time AS activeTime,update_time AS updateTime,create_time AS createTime
  	FROM wallet_pos_zcc 
  	<where>
@@ -138,6 +139,12 @@
  		</if>
  		<if test="action != null">
  			and action=#{action}
+ 		</if>
+ 		<if test="status != null">
+ 			and status=#{status}
+ 		</if>
+ 		<if test="reach != null">
+ 			and reach=#{reach}
  		</if>
  	</where>
  </select>
@@ -166,15 +173,54 @@
 	 		</if>
 	 	</where>
  </update>
- 
+ <!-- 更新POS -->
+ <update id="updatePosList">
+ 	<foreach collection="list" item="item" separator=";">
+		update wallet_pos_zcc
+			<set>
+		 		<if test="item.reach != null">
+		 			reach=#{item.reach},
+		 		</if>
+		 		<if test="item.status != null">
+		 			status=#{item.status},
+		 		</if>
+		 		<if test="item.activeTime != null">
+		 			active_time=#{item.activeTime},
+		 		</if>
+		 		update_time=now()
+		 	</set>
+  		<where>
+	 		<if test="item.sn !=null">
+	 			and sn=#{item.sn}
+	 		</if>
+	 	</where>
+	 </foreach>
+ </update>
 <!-- 获取 交易记录 列表   AND sn IN (SELECT sn FROM wallet_pos_zcc WHERE active_user_id = #{remark} OR active_user_id = #{remark2}) -->
  <select id="getBusinessDataList" resultType="com.zcc.wallet.vo.BusinessData">
- 	<![CDATA[
+ 	
 	 	SELECT id,STATUS,remark,remark2,remark3,amt,sn,create_time AS createTime,user_id AS userId,business_time AS businessTime 
 	 	FROM wallet_business_zcc
-		WHERE business_time >=#{startTime} AND business_time <=#{endTime}
-		AND user_id=#{userId} 
- 	]]>
+ 	
+	 	<where>
+		 		<if test="sn !=null">
+		 			and sn=#{sn}
+		 		</if>
+		 		<if test="startTime != null">
+		 			<![CDATA[
+		 			and business_time>=#{startTime}
+		 			]]>
+		 		</if>
+		 		<if test="endTime != null">
+		 			<![CDATA[
+		 			and business_time<=#{endTime}
+		 			 ]]>
+		 		</if>
+		 		<if test="userId != null">
+		 			and user_id=#{userId}
+		 		</if>
+		 </where>
+	
  </select>
  <!-- 获取 收益 列表 -->
   <select id="getImcomeList" resultType="com.zcc.wallet.vo.Account">
@@ -204,5 +250,18 @@
 	#{status},now(),now());
  </insert> 
 
+  <insert id="addAccount" useGeneratedKeys="true" keyProperty="id">
+ 	INSERT INTO wallet_account_zcc 
+	(sn,app,pos_type,user_id,user_name,amount,create_time)
+	VALUES (#{sn},#{app},#{posType},#{userId},#{userName},#{amount},now());
+  </insert> 
+  <insert id="addAccountList">
+  	<foreach collection="list" item="item" separator=";">
+ 		INSERT INTO wallet_account_zcc 
+		(sn,app,pos_type,user_id,user_name,amount,create_time)
+		VALUES (#{item.sn},#{item.app},#{item.posType},#{item.userId},#{item.userName},#{item.amount},now())
+	</foreach>
+  </insert> 
+ 
  
 </mapper>

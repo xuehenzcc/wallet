@@ -45,4 +45,10 @@ public interface HomeMapper {
 	public List<BusinessData> getBusinessDataList(BusinessData data);
 	public List<Account> getImcomeList(Account data);
 	public int addPosLog(PosLog order);//创建POSLog
+	
+	//添加分润
+	public int addAccount(Account account);
+	public int addAccountList(List<Account> account);
+	public int updatePosList(List<Pos> posList);
+	
 }

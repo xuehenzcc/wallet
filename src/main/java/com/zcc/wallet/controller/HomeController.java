@@ -2,7 +2,6 @@ package com.zcc.wallet.controller;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -174,6 +173,7 @@ public class HomeController extends BaseController{
 		}
 	}
 	//获取POS机器列表
+	//排序功能：待开发
 	@RequestMapping("/getShopList")
 	public void getShopList(HttpServletRequest request,HttpServletResponse response){
 		

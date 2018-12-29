@@ -24,6 +24,7 @@ public class Account {
 //	  `create_time` DATETIME DEFAULT NULL COMMENT '创建时间',
 	private Long id;
 	private String app; 
+	private String sn; 
 	private String posType; 
 	private Long userId; 
 	private String userName; 
@@ -84,6 +85,12 @@ public class Account {
 	}
 	public void setApp(String app) {
 		this.app = app;
+	}
+	public String getSn() {
+		return sn;
+	}
+	public void setSn(String sn) {
+		this.sn = sn;
 	} 
 	
 	

@@ -1,6 +1,7 @@
 package com.zcc.wallet.vo;
 
 import java.util.Date;
+import java.util.List;
 
 /**
  * 商品
@@ -38,6 +39,17 @@ public class Shop {
 	private String content;
 	private Date updateTime;
 	private Date createTime;
+	
+	
+	private List<String> images;
+	
+	
+	public List<String> getImages() {
+		return images;
+	}
+	public void setImages(List<String> images) {
+		this.images = images;
+	}
 	public Long getId() {
 		return id;
 	}

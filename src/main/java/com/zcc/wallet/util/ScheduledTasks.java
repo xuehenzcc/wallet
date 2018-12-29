@@ -28,7 +28,7 @@ public class ScheduledTasks {
 	/**
 	 * 计算pos是否达到激活/刷满返现条件。
 	 */
-	@Scheduled(cron = "0 0/2 * * * ?")  //cron接受cron表达式，根据cron表达式确定定时规则
+//	@Scheduled(cron = "0 0/5 * * * ?")  //cron接受cron表达式，根据cron表达式确定定时规则
     public void testCron() {
         System.out.println("time:"+new Date());
         homeService.getCompPos();
